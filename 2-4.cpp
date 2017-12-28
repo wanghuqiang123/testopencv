@@ -6,7 +6,7 @@ int main(int argc,char** argv)
 {
 	int x = 20;
 	int y = 5;
-	CvMat* mat1 = cvCreateMat(100,100,CV_8UC3 );
+	CvMat* mat1 = cvCreateMat(100,100,CV_8UC3 ); //CV_8UC3为无符号8位3通道；
 	cvSetZero(mat1);
 	CvScalar mat1_scalar = cvScalar(0,255,0);
 	CvPoint mat1_point1 = cvPoint(20,5);
@@ -16,7 +16,7 @@ int main(int argc,char** argv)
 	{
 		for(y = 5;y<20;y++)
 		{
-			cvSet2D(mat1,y,x,mat1_scalar);
+			cvSet2D(mat1,y,x,mat1_scalar);//设置矩阵中像素点的数值；
 		}
 	}
 
