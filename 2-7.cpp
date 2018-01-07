@@ -1,34 +1,34 @@
 
 
-
-/***************<learing opencv> Á·Ï°2ÖĞµÄ7Ğ¡ÎÊµÄ´ğ°¸***************/
+//æ©ç å›¾åƒå°±æ˜¯ä¸€ä¸ªçŸ©é˜µæ•°æ®ã€‚é‡Œé¢æœ‰Width*Heightä¸ªæ•°æ®ã€‚åƒç´ å€¼ä¸º0è¡¨ç¤ºè¿™ç‚¹åƒç´ ä¸å¤„ç†ï¼Œä¸º1è¡¨ç¤ºè¦å¤„ç†
+/***************<learing opencv> ç»ƒä¹ 2ä¸­çš„7å°é—®çš„ç­”æ¡ˆ***************/
 #include"cv.h"
 #include"highgui.h"
 #include<stdio.h>
 
 int main(int argc,char** argv)
 {
-	IplImage* img = cvLoadImage("imdata/eight.tif");  //¶ÁÈ¡Ò»·ùÍ¼Ïñ£»
+	IplImage* img = cvLoadImage("imdata/eight.tif");  //è¯»å–ä¸€å¹…å›¾åƒï¼›
 	IplImage* rImg = cvCreateImage(cvGetSize(img), img->depth, 1);
 	IplImage* gImg = cvCreateImage(cvGetSize(img), img->depth, 1);
-	IplImage* bImg = cvCreateImage(cvGetSize(img), img->depth, 1);  //´´½¨µ¥Í¨µÀr,g,bÍ¼Ïñ
+	IplImage* bImg = cvCreateImage(cvGetSize(img), img->depth, 1);  //åˆ›å»ºå•é€šé“r,g,bå›¾åƒ
 	
 	IplImage* clone1 = cvCreateImage(cvGetSize(img), img->depth, 1);
 	IplImage* clone2 = cvCreateImage(cvGetSize(img), img->depth, 1);
 	double green_maxPixel = 0;
-	double green_minPixel = 0; //ÂÌÉ«Æ½Ãæ×î´ó×îĞ¡Öµ
-	double thresh;  //ãĞÖµthresh
-	cvSplit(img, rImg, gImg, bImg,NULL); //²ğ·Ö3Í¨µÀ
+	double green_minPixel = 0; //ç»¿è‰²å¹³é¢æœ€å¤§æœ€å°å€¼
+	double thresh;  //é˜ˆå€¼thresh
+	cvSplit(img, rImg, gImg, bImg,NULL); //æ‹†åˆ†3é€šé“
 	
-	/*¿ËÂ¡Á½´Î*/
+	/*å…‹éš†ä¸¤æ¬¡*/
 	cvCopy(gImg,clone1);
 	cvCopy(gImg,clone2);
 
-	/*ÇóÈ¡×î´óÖµºÍ×îĞ¡Öµ*/
+	/*æ±‚å–æœ€å¤§å€¼å’Œæœ€å°å€¼*/
 	cvMinMaxLoc(gImg,&green_minPixel,&green_maxPixel);
 	printf("the min is %d,the max is %d",green_minPixel,green_maxPixel);
 
-	/*½«clone1µÄËùÓĞÔªËØ¸´ÖÆµÄthresh*/
+	/*å°†clone1çš„æ‰€æœ‰å…ƒç´ å¤åˆ¶çš„thresh*/
 	thresh = green_maxPixel - green_minPixel;
 	cvSet(clone1,thresh);
 
