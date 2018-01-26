@@ -12,6 +12,7 @@ using namespace std;
 bool erase = false;
 bool draw_box = false;
 bool draw_circle = false;
+bool draw_line = false;
 double circle_radio = 0;
 IplImage* img = NULL;
 CvRect box;
@@ -22,7 +23,7 @@ CvFont font;
 
 
 void mymousecallback(int event,int x,int y,int flag,void* param);
-void draw_box1(IplImage* image,CvRect rect)
+void draw_box1(IplImage* image)
 {
 	cvRectangle( image,
 				cvPoint(box.x,box.y),
@@ -34,6 +35,13 @@ void draw_circle_function(IplImage* image,CvPoint circle_point )
 	cvCircle(image,circle_point,(int)circle_radio,cvScalar(0,255,0),-1); 
 }
 
+void draw_line_function(IplImage* image)
+{
+	cvLine( image,
+			cvPoint(box.x,box.y),
+			cvPoint(box.x+box.width,box.y+box.height),
+			cvScalar(255,0,0));
+}
 int main()
 {  
 	img = cvCreateImage(cvSize(1200,600),IPL_DEPTH_8U,3);
@@ -45,26 +53,23 @@ int main()
 	IplImage* tempimage = cvCloneImage(img);
 	IplImage* img1 = cvCreateImage(cvSize(1200,600),IPL_DEPTH_8U,3);
 	cvCopy(img,img1);
-	cvCreateTrackbar("Selection of graphics","window",&position,3,NULL);
+	cvCreateTrackbar("Selection of graphics","window",&position,4,NULL);
 	cvInitFont(&font,CV_FONT_HERSHEY_SIMPLEX,1.0,1.0);
 	while(1)
 	{ 
 		cvCopy(img,tempimage);
-		  switch(position)
-		  {
-		  case	0:
 			if(draw_box)
-				{
-					  draw_box1(tempimage,box);
-				 }
-				  break;
-		  case 1:
+			  {
+				 draw_box1(tempimage);
+			  }
 			  if(draw_circle)
 			  {
-					draw_circle_function(tempimage,circle_point);
+				draw_circle_function(tempimage,circle_point);
 			  }
-			  break;
-		  }
+			  if(draw_line)
+			  {
+				  draw_line_function(tempimage);
+			  }
 		  if(erase)
 		  {
 			  cvCopy(img1,tempimage);
@@ -110,6 +115,13 @@ void mymousecallback(int event,int x,int y,int flag,void* param)
 					circle_radio = sqrt((x-circle_point.x)*(x-circle_point.x)+(y-circle_point.y)*(y-circle_point.y));
 				}
 				break;
+			case 4:
+				if(draw_line)
+				{
+					box.width = x-box.x;
+					box.height = y-box.y;
+				}
+				break;
 			}
 			break;
 		case CV_EVENT_LBUTTONDOWN:
@@ -125,6 +137,12 @@ void mymousecallback(int event,int x,int y,int flag,void* param)
 				{
 					draw_circle = true;
 					circle_point = cvPoint(x,y);
+				}
+				break;
+			case 4:
+				{
+					draw_line = true;
+					box = cvRect(x,y,0,0);
 				}
 				break;
 			}
@@ -145,7 +163,7 @@ void mymousecallback(int event,int x,int y,int flag,void* param)
 						box.y += box.height;
 						box.height *= -1;
 					}
-					draw_box1(img,box);
+					draw_box1(img);
 				}
 				break;
 			case 1:
@@ -153,6 +171,13 @@ void mymousecallback(int event,int x,int y,int flag,void* param)
 					draw_circle = false;
 					circle_radio = sqrt((x-circle_point.x)*(x-circle_point.x)+(y-circle_point.y)*(y-circle_point.y));
 					draw_circle_function(img,circle_point);
+					circle_radio = 0;
+				}
+				break;
+			case 4:
+				{				
+				    draw_line = false;
+					draw_line_function(img);
 				}
 				break;
 			}
