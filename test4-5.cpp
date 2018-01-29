@@ -13,10 +13,14 @@ bool erase = false;
 bool draw_box = false;
 bool draw_circle = false;
 bool draw_line = false;
+bool draw_ellipse = false;
 double circle_radio = 0;
 IplImage* img = NULL;
 CvRect box;
 CvPoint circle_point;
+CvPoint2D32f ellipse_center;
+CvSize2D32f ellipse_axes;
+float angle;
 int position = 0;
 const char* text[5] = {"box","circle","ellipse","polygon","line"};
 CvFont font;
@@ -42,6 +46,17 @@ void draw_line_function(IplImage* image)
 			cvPoint(box.x+box.width,box.y+box.height),
 			cvScalar(255,0,0));
 }
+
+void draw_ellipse_function(IplImage* image,CvPoint2D32f center,CvSize2D32f axes,float angle)
+{
+	CvBox2D box;
+	box.angle = angle;
+	box.center	= center;
+	box.size = axes;
+
+	cvEllipseBox(image,box,cvScalar(0,255,255),-1);   // b / a = 0.7861;
+}
+
 int main()
 {  
 	img = cvCreateImage(cvSize(1200,600),IPL_DEPTH_8U,3);
@@ -50,7 +65,7 @@ int main()
 	cvSetZero(img);
 	box = cvRect(-1,-1,0,0);
 	cvSetMouseCallback("window",mymousecallback,(void*)img);
-	IplImage* tempimage = cvCloneImage(img);
+	IplImage* tempimage = cvCloneImage(img);  // 克隆不是两个图像指针指在同一个内存空间；
 	IplImage* img1 = cvCreateImage(cvSize(1200,600),IPL_DEPTH_8U,3);
 	cvCopy(img,img1);
 	cvCreateTrackbar("Selection of graphics","window",&position,4,NULL);
@@ -69,6 +84,10 @@ int main()
 			  if(draw_line)
 			  {
 				  draw_line_function(tempimage);
+			  }
+			  if(draw_ellipse)
+			  {
+				  draw_ellipse_function(tempimage,ellipse_center,ellipse_axes,angle);
 			  }
 		  if(erase)
 		  {
@@ -115,6 +134,24 @@ void mymousecallback(int event,int x,int y,int flag,void* param)
 					circle_radio = sqrt((x-circle_point.x)*(x-circle_point.x)+(y-circle_point.y)*(y-circle_point.y));
 				}
 				break;
+			case 2:
+				if(draw_ellipse)
+				{
+					ellipse_axes.width	 = (float)sqrt((x-ellipse_center.x)*(x-ellipse_center.x) + (y-ellipse_center.y)*(y-ellipse_center.y));
+					ellipse_axes.height = ellipse_axes.width * 0.7861;
+					if((x-ellipse_center.x)>0 && (y-ellipse_center.y)>0)
+						angle = asin(abs((y-ellipse_center.y)/(x-ellipse_center.x)));
+
+					if((x-ellipse_center.x)<0 && (y-ellipse_center.y)>0)
+						angle = asin(abs((y-ellipse_center.y)/(x-ellipse_center.x))) + 90;
+
+					if((x-ellipse_center.x)<0 && (y-ellipse_center.y)<0)
+						angle = asin(abs((y-ellipse_center.y)/(x-ellipse_center.x))) + 180;
+
+					if((x-ellipse_center.x)>0 && (y-ellipse_center.y)<0)
+						angle = asin(abs((y-ellipse_center.y)/(x-ellipse_center.x)))  + 270;
+				}
+				break;
 			case 4:
 				if(draw_line)
 				{
@@ -137,6 +174,12 @@ void mymousecallback(int event,int x,int y,int flag,void* param)
 				{
 					draw_circle = true;
 					circle_point = cvPoint(x,y);
+				}
+				break;
+			case 2:
+				{
+					draw_ellipse = true;
+					ellipse_center = cvPoint2D32f(x,y);
 				}
 				break;
 			case 4:
@@ -172,6 +215,13 @@ void mymousecallback(int event,int x,int y,int flag,void* param)
 					circle_radio = sqrt((x-circle_point.x)*(x-circle_point.x)+(y-circle_point.y)*(y-circle_point.y));
 					draw_circle_function(img,circle_point);
 					circle_radio = 0;
+				}
+				break;
+			case 2:
+				{
+					draw_ellipse = false;
+					draw_ellipse_function(img,ellipse_center,ellipse_axes,angle);
+					ellipse_axes = 0;
 				}
 				break;
 			case 4:
