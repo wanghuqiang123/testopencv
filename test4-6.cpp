@@ -6,10 +6,11 @@
 #include<highgui.h>
 #include<iostream>
 #include<math.h>
+#include<iostream>
+
 
 using namespace std;
 
-bool text;
 CvFont font;
 void myMouseCallback(int event,int x,int y,int flags,void* image)
 {
@@ -17,7 +18,11 @@ void myMouseCallback(int event,int x,int y,int flags,void* image)
 
 	if(event == CV_EVENT_LBUTTONDOWN)
 	{
-		cvPutText(img,"image",cvPoint(x,y),&font,cvScalar(0,255,0));
+		char t[5];
+		for(int i = 0;i < 5;i++)
+			cin>>t[i];
+
+		cvPutText(img,t,cvPoint(x,y),&font,cvScalar(0,255,0));
 	}
 }
 
